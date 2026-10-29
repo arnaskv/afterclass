@@ -1,0 +1,14 @@
+@import "tailwindcss";
+@import "./theme.css";
+@import "./animations.css";
+
+@layer base {
+  html {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-sans);
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-focus;
+  }
+}
