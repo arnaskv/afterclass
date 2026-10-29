@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: Backend (build, test, OpenAPI drift)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore Afterclass.slnx
+
+      - name: Build
+        run: dotnet build Afterclass.slnx --configuration Release --no-restore
+
+      # Integration tests start PostgreSQL through Testcontainers (Docker is available on GitHub runners).
+      - name: Test
+        run: dotnet test --solution Afterclass.slnx --configuration Release --no-build --report-trx --results-directory artifacts/test-results
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: backend-test-results
+          path: artifacts/test-results
+
+  frontend:
+    name: Frontend (format, lint, unit, build, generated client)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/Afterclass.Web
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: src/Afterclass.Web/package-lock.json
+
+      - run: npm ci
+
+      - name: Generated API client matches the OpenAPI snapshot
+        run: |
+          npm run api:generate
+          git diff --exit-code -- src/shared/api/generated
+
+      - run: npm run check
+
+  e2e:
+    name: Browser journeys (mocked API)
+    runs-on: ubuntu-latest
+    needs: frontend
+    defaults:
+      run:
+        working-directory: src/Afterclass.Web
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: src/Afterclass.Web/package-lock.json
+
+      - run: npm ci
+      - run: npx --no-install playwright install --with-deps chromium
+      - run: npm run test:e2e
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: src/Afterclass.Web/playwright-report
