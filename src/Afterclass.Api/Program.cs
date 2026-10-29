@@ -25,7 +25,7 @@ builder.Services.AddOpenApi(options => options.AddDocumentTransformer((document,
 builder.Services.AddSingleton(TimeProvider.System);
 
 builder.AddAfterclassAuthentication();
-builder.Services.AddAfterclassAntiforgery();
+builder.AddAfterclassAntiforgery();
 
 builder.Services.AddScoped<ProfileOperations>();
 

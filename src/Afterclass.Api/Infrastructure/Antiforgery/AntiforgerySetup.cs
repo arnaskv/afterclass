@@ -1,3 +1,4 @@
+using Afterclass.Api.Infrastructure.Authentication;
 using Microsoft.AspNetCore.Antiforgery;
 
 namespace Afterclass.Api.Infrastructure.Antiforgery;
@@ -6,18 +7,20 @@ internal static class AntiforgerySetup
 {
     public const string HeaderName = "X-XSRF-TOKEN";
 
-    public static IServiceCollection AddAfterclassAntiforgery(this IServiceCollection services)
+    public static WebApplicationBuilder AddAfterclassAntiforgery(this WebApplicationBuilder builder)
     {
-        services.AddAntiforgery(options =>
+        var cookieSecurePolicy = CookieSecurity.PolicyFor(builder.Environment);
+
+        builder.Services.AddAntiforgery(options =>
         {
             options.HeaderName = HeaderName;
             options.Cookie.Name = "afterclass.antiforgery";
             options.Cookie.HttpOnly = true;
             options.Cookie.SameSite = SameSiteMode.Strict;
-            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.Cookie.SecurePolicy = cookieSecurePolicy;
         });
 
-        return services;
+        return builder;
     }
 
     /// <summary>

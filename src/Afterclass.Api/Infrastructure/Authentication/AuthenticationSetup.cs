@@ -15,6 +15,8 @@ internal static class AuthenticationSetup
     /// </summary>
     public static WebApplicationBuilder AddAfterclassAuthentication(this WebApplicationBuilder builder)
     {
+        var cookieSecurePolicy = CookieSecurity.PolicyFor(builder.Environment);
+
         builder.Services.AddOptions<OidcSettings>()
             .BindConfiguration(OidcSettings.SectionName)
             .ValidateDataAnnotations()
@@ -32,7 +34,7 @@ internal static class AuthenticationSetup
                 options.Cookie.Name = SessionCookieName;
                 options.Cookie.HttpOnly = true;
                 options.Cookie.SameSite = SameSiteMode.Lax;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.SecurePolicy = cookieSecurePolicy;
                 options.ExpireTimeSpan = TimeSpan.FromHours(8);
                 options.SlidingExpiration = true;
 
@@ -59,6 +61,13 @@ internal static class AuthenticationSetup
 
                 options.ResponseType = "code";
                 options.UsePkce = true;
+                // The IdP returns to /signin-oidc with a top-level GET, so correlation and nonce cookies can be
+                // SameSite=Lax. form_post would need SameSite=None, which browsers reject on plain-http localhost.
+                options.ResponseMode = "query";
+                options.CorrelationCookie.SameSite = SameSiteMode.Lax;
+                options.CorrelationCookie.SecurePolicy = cookieSecurePolicy;
+                options.NonceCookie.SameSite = SameSiteMode.Lax;
+                options.NonceCookie.SecurePolicy = cookieSecurePolicy;
                 // Needed for id_token_hint on sign-out; stored in the encrypted cookie ticket, not in the browser.
                 options.SaveTokens = true;
                 options.GetClaimsFromUserInfoEndpoint = true;
