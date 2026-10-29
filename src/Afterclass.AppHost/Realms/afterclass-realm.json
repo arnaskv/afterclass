@@ -1,0 +1,55 @@
+{
+  "realm": "afterclass",
+  "displayName": "Afterclass (local development)",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": false,
+  "rememberMe": true,
+  "internationalizationEnabled": true,
+  "supportedLocales": ["lt", "en"],
+  "defaultLocale": "lt",
+  "clients": [
+    {
+      "clientId": "afterclass-web",
+      "name": "Afterclass web (BFF)",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${AFTERCLASS_WEB_CLIENT_SECRET}",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": ["http://localhost:5173/signin-oidc"],
+      "webOrigins": ["http://localhost:5173"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:5173/signout-callback-oidc"
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "owner@afterclass.local",
+      "email": "owner@afterclass.local",
+      "emailVerified": true,
+      "firstName": "Ona",
+      "lastName": "Savininkė",
+      "enabled": true,
+      "credentials": [{ "type": "password", "value": "Afterclass1!", "temporary": false }]
+    },
+    {
+      "username": "coach@afterclass.local",
+      "email": "coach@afterclass.local",
+      "emailVerified": true,
+      "firstName": "Tomas",
+      "lastName": "Treneris",
+      "enabled": true,
+      "credentials": [{ "type": "password", "value": "Afterclass1!", "temporary": false }]
+    }
+  ]
+}

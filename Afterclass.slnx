@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Afterclass.Api/Afterclass.Api.csproj" />
+    <Project Path="src/Afterclass.AppHost/Afterclass.AppHost.csproj" />
+    <Project Path="src/Afterclass.MigrationService/Afterclass.MigrationService.csproj" />
+    <Project Path="src/Afterclass.Persistence/Afterclass.Persistence.csproj" />
+    <Project Path="src/Afterclass.ServiceDefaults/Afterclass.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Afterclass.Api.IntegrationTests/Afterclass.Api.IntegrationTests.csproj" />
+    <Project Path="tests/Afterclass.Api.UnitTests/Afterclass.Api.UnitTests.csproj" />
+  </Folder>
+</Solution>
